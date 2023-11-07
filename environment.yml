@@ -13,4 +13,4 @@ dependencies:
   - molvs
   - matplotlib
   - coiled
-  - dask[complete]
+  - "dask[complete]"
