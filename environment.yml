@@ -12,3 +12,5 @@ dependencies:
   - pymol-open-source
   - molvs
   - matplotlib
+  - coiled
+  - dask[complete]
