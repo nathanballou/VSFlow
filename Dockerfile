@@ -9,7 +9,7 @@ COPY environment.yml setup.py vsflow README.md ./
 COPY vslib ./vslib
 
 # Create the conda environment using micromamba
-RUN micromamba create --yes --file environment.yml && \
+RUN micromamba create --yes --file environment.yml --platform linux-64 && \
     micromamba clean --all --yes
 
 # Activate the environment and install the package
