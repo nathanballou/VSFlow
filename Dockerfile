@@ -10,11 +10,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Create a new user to avoid running as root and set the working directory
-RUN useradd --create-home micromamba
-USER micromamba
-WORKDIR /home/micromamba
-
 # Copy necessary files into the container
 COPY environment.yml setup.py vsflow README.md ./
 COPY vslib ./vslib
@@ -23,16 +18,14 @@ COPY vslib ./vslib
 RUN micromamba shell init -s bash -p ~/micromamba && \
     echo "source ~/micromamba/etc/profile.d/mamba.sh" >> ~/.bashrc && \
     eval "$(micromamba shell hook --shell bash)" && \
-    micromamba create -y -n vsflow --file environment.yml --platform linux-64 && \
-    micromamba clean --all --yes && \
-    micromamba activate vsflow && \
-    pip install . && \
-    micromamba deactivate
+    micromamba env create -y --file environment.yml --platform linux-64 && \
+    micromamba clean --all --yes
 
-# Switch back to root to remove installation files
-USER root
-RUN rm -rf ./vslib environment.yml setup.py vsflow README.md
-
-# Switch back to micromamba user and update .bashrc to activate the environment on login
-USER micromamba
+# Activate the environment on login
 RUN echo "micromamba activate vsflow" >> ~/.bashrc
+
+# Assuming the Python executable is in the standard location within the environment:
+ENV PATH /opt/conda/envs/vsflow/bin:$PATH
+
+# Remove unnecessary files
+RUN rm -rf ./vslib environment.yml setup.py vsflow README.md
