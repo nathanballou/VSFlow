@@ -1,26 +1,7 @@
-# Use an appropriate micromamba base image
-FROM mambaorg/micromamba:latest
+FROM continuumio/miniconda3
 
-# Set the working directory
-WORKDIR /home/micromamba
-
-# Copy necessary files into the container
-COPY environment.yml setup.py vsflow README.md ./
-COPY vslib ./vslib
-
-# Create the conda environment using micromamba
-RUN micromamba create --yes --file environment.yml --platform linux-64 && \
-    micromamba clean --all --yes
-
-# Activate the environment and install the package
-RUN micromamba shell init -s bash -p ~/micromamba && \
-    echo "source ~/micromamba/etc/profile.d/mamba.sh" >> ~/.bashrc && \
-    bash -c "source ~/.bashrc && \
-    micromamba activate vsflow && \
-    pip install ."
-
-# Clean up the installation files
-RUN rm -rf ./vslib environment.yml setup.py vsflow README.md
-
-# Update the .bashrc to activate the environment on login
-RUN sed -ie 's/base/vsflow/' ~/.bashrc
+RUN apt-get update && apt-get install --quiet --yes --no-install-recommends libgl1 && apt-get clean && rm -rf /var/lib/apt/lists/* && mkdir /install
+COPY environment.yml setup.py vsflow README.md /install/
+COPY vslib /install/vslib
+RUN conda env create --file /install/environment.yml --platform linux-64 && conda clean --all --yes
+RUN bash -c "source /opt/conda/bin/activate vsflow && pip install /install" && rm -rf /install && sed -ie 's/base/vsflow/' /root/.bashrc
