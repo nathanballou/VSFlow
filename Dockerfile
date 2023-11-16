@@ -16,7 +16,7 @@ COPY vslib ./vslib
 
 ENV PATH /opt/conda/envs/vsflow/bin:$PATH
 
-# Initialize micromamba, create environment, and clean up in one command
+# Initialize micromamba, create environment, install VSFlow and cleanup
 RUN micromamba shell init -s bash -p ~/micromamba && \
     echo "source ~/micromamba/etc/profile.d/mamba.sh" >> ~/.bashrc && \
     eval "$(micromamba shell hook --shell bash)" && \
